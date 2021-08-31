@@ -25,7 +25,7 @@ app.get("/entries", (req, res) => {
 //Handles POST requests
 app.post("/add-entry", (req, res) => {
   projectData = req.body;
-  res.send(projectData);
+  res.send({})
   res.end();
 });
 

@@ -18,33 +18,41 @@ async function sendHttpRequest(url, body) {
 // Event handler
 async function generate() {
   // Create a new date instance dynamically with JS
-  let d = new Date();
-  let newDate = d.getMonth() + 1 + "." + d.getDate() + "." + d.getFullYear();
+  try {
+    let d = new Date();
+    let newDate =
+      d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
 
-  const userFeelings = document.getElementById("feelings").value;
-  const zipCode = document.getElementById("zip").value;
-  const apiKey = "b3130673f45f4b6775b90cb7bda077f4";
+    const userFeelings = document.getElementById("feelings").value;
+    const zipCode = document.getElementById("zip").value;
+    const apiKey = "b3130673f45f4b6775b90cb7bda077f4";
 
-  //Sends a GET request to the API to obtain temperature
-  const data = await sendHttpRequest(
-    `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},us&appid=${apiKey}&units=metric`
-  );
-  const temp = data.main.temp;
+    //Sends a GET request to the API to obtain temperature
+    const data = await sendHttpRequest(
+      `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},us&appid=${apiKey}&units=metric`
+    );
+    const temp = data.main.temp;
 
-  //Sends a POST request to the server including the obtained data
-  const projectData = await sendHttpRequest("http://localhost:8000/add-entry", {
-    temp,
-    newDate,
-    userFeelings,
-  });
+    //Sends a POST request to the server including the obtained data
+    await sendHttpRequest("http://localhost:8000/add-entry", {
+      temp,
+      newDate,
+      userFeelings,
+    });
 
-  //Updates UI 
-  const dateHolder = document.getElementById("date");
-  dateHolder.innerHTML = "Date: " + projectData.newDate;
-  const tempHolder = document.getElementById("temp");
-  tempHolder.innerHTML = "Temperature: " + projectData.temp + " °C";
-  const contentHolder = document.getElementById("content");
-  contentHolder.innerHTML = "Your feelings: " + projectData.userFeelings;
+    //Updates UI
+    const projectData = await sendHttpRequest("http://localhost:8000/entries");
+    const dateHolder = document.getElementById("date");
+    dateHolder.innerHTML = "Date: " + projectData.newDate;
+    const tempHolder = document.getElementById("temp");
+    tempHolder.innerHTML =
+      "Temperature: " + Math.round(projectData.temp) + "°C";
+    const contentHolder = document.getElementById("content");
+    contentHolder.innerHTML = "Your feelings: " + projectData.userFeelings;
+  } catch (er) {
+    console.error(er);
+    alert("Something went wrong!");
+  }
 }
 
 // Adds event listener to the generate button
